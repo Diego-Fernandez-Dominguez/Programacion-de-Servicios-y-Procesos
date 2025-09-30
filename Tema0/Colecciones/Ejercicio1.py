@@ -1,9 +1,8 @@
 import random
 
-lista=[]
-cont=0
+list=[]
 
-while len(lista) < 10:
-    lista.append(random.randint(1,101))
+while len(list) < 10:
+    list.append(random.randint(1,101))
 
-print(lista)
+print(list)
