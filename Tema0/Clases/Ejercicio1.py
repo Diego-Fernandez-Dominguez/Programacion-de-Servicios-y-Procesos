@@ -27,5 +27,16 @@ class CuentaCorriente:
     def __str__(self):
         print("DNI: ", self.DNI, " - Nombre: ", self.nombre, " - Saldo: ", self.saldo)
 
-    def __eq__(self, value):
-         pass
+    def __eq__(self, cuenta):
+        equals=False
+
+        if self.DNI==cuenta.DNI:
+              equals=True
+
+        return equals
+    
+    def __lt__(self, cuenta):
+        menor=False
+        if self.saldo < cuenta.saldo:
+              menor=True
+        return menor
