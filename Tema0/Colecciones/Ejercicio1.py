@@ -3,6 +3,6 @@ import random
 list=[]
 
 while len(list) < 10:
-    list.append(random.randint(1,101))
+    list.append(random.randint(1,100))
 
 print(list)

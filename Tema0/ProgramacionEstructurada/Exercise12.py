@@ -14,8 +14,8 @@ num1=int(input("Say a number: "))
 num2=int(input("Say another number: "))
 
 
-print("Choose an option: 1.Suma - 2.Resta - 3.Multiplicacion - 4.Division")
-value=int(input("Say an option: "))
+print("1.Suma - 2.Resta - 3.Multiplicacion - 4.Division")
+value=int(input("Choose an option: "))
 
 
 match value:
