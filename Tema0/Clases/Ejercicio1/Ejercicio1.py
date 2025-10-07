@@ -25,7 +25,8 @@ class CuentaCorriente:
              print("El saldo debe ser positivo")
 
     def __str__(self):
-        print("DNI: ", self.DNI, " - Nombre: ", self.nombre, " - Saldo: ", self.saldo)
+        cadena="DNI: "+ self.DNI+ " - Nombre: "+ self.nombre+ " - Saldo: "+ str(self.saldo)
+        return cadena
 
     def __eq__(self, cuenta):
         equals=False
@@ -40,3 +41,4 @@ class CuentaCorriente:
         if self.saldo < cuenta.saldo:
               menor=True
         return menor
+
