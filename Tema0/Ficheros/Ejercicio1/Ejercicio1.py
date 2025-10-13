@@ -11,5 +11,7 @@ for linea in f.readlines():
     print(datos[0])
     cont=cont+1
 
+f.close()
+
 print("Edad medias: " + str(edades/cont))
 print("Estaturas medias: " + str(estaturas/cont))
