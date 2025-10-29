@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException
 from pydantic import BaseModel
 
-app = FastAPI()
+router = APIRouter(prefix="/articles", tags=["articles"])
 
 class Article(BaseModel):
     id: int
@@ -16,28 +16,28 @@ article_list = [
     Article(id=3, title="Modern art", body="A new art exhibition opened.", date="2025-08-30", journalist_id=3),
 ]
 
-@app.get("/articles")
+@router.get("/")
 def get_articles():
     return article_list
 
-@app.get("/articles/{id_article}")
+@router.get("/{id_article}")
 def get_article(id_article: int):
     articles = [a for a in article_list if a.id == id_article]
     if not articles:
         raise HTTPException(status_code=404, detail="Article not found")
     return articles[0]
 
-@app.get("/articles/")
+@router.get("/query/")
 def get_article_by_query(id: int):
     return search_article(id)
 
-@app.post("/articles", status_code=201, response_model=Article)
+@router.post("/", status_code=201, response_model=Article)
 def add_article(article: Article):
     article.id = next_id()
     article_list.append(article)
     return article
 
-@app.put("/articles/{id}")
+@router.put("/{id}")
 def modify_article(id: int, article: Article):
     for index, saved_article in enumerate(article_list):
         if saved_article.id == id:
@@ -46,7 +46,7 @@ def modify_article(id: int, article: Article):
             return article
     raise HTTPException(status_code=404, detail="Article not found")
 
-@app.delete("/articles/{id}")
+@router.delete("/{id}")
 def delete_article(id: int):
     for saved_article in article_list:
         if saved_article.id == id:
