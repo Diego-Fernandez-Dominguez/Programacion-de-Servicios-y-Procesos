@@ -17,3 +17,7 @@ web_pages = [
     Web_Page(id=4, title="FitnessPro", theme="Deporte y Salud", url="https://fitnesspro.example.com", id_programmer=4),
     Web_Page(id=5, title="BookCorner", theme="Literatura", url="https://bookcorner.example.com", id_programmer=5)
 ]
+
+@router.get("/web_pages")
+def web_pages():
+    return web_pages

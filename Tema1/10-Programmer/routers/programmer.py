@@ -1,7 +1,7 @@
 from fastapi import APIRouter, FastAPI, HTTPException
 from pydantic import BaseModel
 
-router=APIRouter(prefix="/programmers", tags=["programmer"])
+router=APIRouter(prefix="/programmers", tags=["programmers"])
 
 class Programmer(BaseModel):
     id:int
@@ -32,7 +32,7 @@ def get_programmer(id:int):
     else:
         return programmers[0]
     
-@router.get("/query")
+@router.get("")
 def get_programmers_by_query(id:int):
     return search_programmers
 
