@@ -91,10 +91,6 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
             raise HTTPException(status_code=400, detail="Error al verificar la contraseña")
     raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectas")
 
-@router.post("/", status_code=201, response_model=User)
-def add_user(user:User, authorized = Depends(auth_user)):
-    pass
-
 #Functions
 
 async def auth_user(token:str = Depends(oauth2)):
