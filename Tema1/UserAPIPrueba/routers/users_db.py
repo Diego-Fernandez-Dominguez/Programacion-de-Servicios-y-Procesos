@@ -9,8 +9,6 @@ from bson import ObjectId
 
 router = APIRouter(prefix="/usersdb", tags=["usersdb"])
 
-
-
 # la siguiente lista pretende simular una base de datos para probar nuestra API
 users_list = []
 
