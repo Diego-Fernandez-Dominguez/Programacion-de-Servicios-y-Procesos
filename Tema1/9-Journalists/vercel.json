@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "JournalistsAPI",
+    "builds": [
+    {
+        "src": "main.py",
+        "use": "@vercel/python"
+    }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "main.py"
+        }
+    ]
+}
