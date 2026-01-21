@@ -21,7 +21,7 @@ def leer_numerines_de_fichero_muy_chulo(q, ruta_fichero):
 
 if __name__ == "__main__":
     
-    ficherin = 'Tema2\\Ejercicio3\\numerines.txt'
+    ficherin = 'Tema2\\Parte1_LaPrecuela\\numerines.txt'
     queue = Queue()
 
     start_time = time.time()
