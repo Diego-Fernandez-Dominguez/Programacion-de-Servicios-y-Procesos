@@ -1,4 +1,5 @@
 from multiprocessing import Process, Queue
+import os
 
 def leer_fichero(ruta_fichero, cola):
     with open(ruta_fichero, 'r') as f:
@@ -29,7 +30,9 @@ def sumar_rangos(cola):
 
 if __name__ == "__main__":
 
-    ficherin = './ficherin.txt'
+    base = os.path.dirname(os.path.abspath(__file__)) 
+    ficherin = os.path.join(base, "ficherin.txt")
+
     cola = Queue()
 
     p_lector = Process(target=leer_fichero, args=(ficherin, cola))

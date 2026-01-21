@@ -1,5 +1,6 @@
 from multiprocessing import Process, Queue
 import time
+import os
 
 def suma_numerines(numerin):
     suma = 0
@@ -16,12 +17,13 @@ def leer_numerines_de_fichero_muy_chulo(q, ruta_fichero):
             linea = linea.strip()
             if linea:
                 q.put(int(linea))
-
     q.put(None)
 
 if __name__ == "__main__":
+
+    base = os.path.dirname(os.path.abspath(__file__)) 
+    ficherin = os.path.join(base, "numerines.txt")
     
-    ficherin = 'Tema2\\Parte1_LaPrecuela\\numerines.txt'
     queue = Queue()
 
     start_time = time.time()

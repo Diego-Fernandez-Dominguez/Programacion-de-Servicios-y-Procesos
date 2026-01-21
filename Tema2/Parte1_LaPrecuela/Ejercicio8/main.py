@@ -1,4 +1,5 @@
 from multiprocessing import Process, Pipe
+import os
 
 def leer_fichero(ruta_fichero, conn):
     with open(ruta_fichero, 'r') as f:
@@ -30,7 +31,9 @@ def sumar_rangos(conn):
 
 if __name__ == "__main__":
 
-    fichero = "numeros.txt"
+    
+    base = os.path.dirname(os.path.abspath(__file__)) 
+    fichero = os.path.join(base, "ficherin.txt")
 
     conn_lector, conn_sumador = Pipe()
 

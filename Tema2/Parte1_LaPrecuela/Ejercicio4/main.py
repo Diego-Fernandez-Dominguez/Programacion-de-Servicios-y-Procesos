@@ -1,5 +1,6 @@
 from multiprocessing import Process, Queue, Pipe
 import time
+import os
 
 def suma_numerines(numerin):
     suma = 0
@@ -24,7 +25,8 @@ if __name__ == "__main__":
 
     left, right = Pipe()
 
-    ficherin = 'Tema2\\Ejercicio3\\numerines.txt'
+    base = os.path.dirname(os.path.abspath(__file__)) 
+    ficherin = os.path.join(base, "numerines.txt")
 
 
     p1 = Process(target=leer_numerines_de_fichero_muy_chulo, args=(left, ficherin))
