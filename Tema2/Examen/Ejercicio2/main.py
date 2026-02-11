@@ -1,130 +1,80 @@
-import subprocess
-import sys
+from multiprocessing import Process, Pipe
 
-# Función que ejecuta el Proceso 1: filtra por departamento
-def proceso_filtro1(departamento):
-    # Abrimos el fichero salarios.txt
-    with open("salarios.txt", 'r') as fichero:
-        # Leemos todas las líneas
-        lineas = fichero.readlines()
-        
-        # Procesamos cada línea
-        for linea in lineas:
-            # Quitamos saltos de línea y espacios
+def proceso_filtro1(departamento, conn):
+    # Abrimos el fichero
+    with open("salarios.txt", 'r') as f:
+        for linea in f:
             linea = linea.strip()
+            ape, nom, dep, sal = linea.split(',')
             
-            # Separamos los campos por comas
-            campos = linea.split(',')
-            
-            # Los campos son: apellido, nombre, departamento, salario
-            apellido = campos[0]
-            nombre = campos[1]
-            dept = campos[2]
-            salario = campos[3]
-            
-            # Si el departamento coincide, enviamos la línea sin el departamento
-            if dept == departamento:
-                # Enviamos: apellido,nombre,salario
-                print(f"{apellido},{nombre},{salario}")
-
-# Función que ejecuta el Proceso 2: filtra por salario mínimo
-def proceso_filtro2(salario_minimo):
-    # Leemos las líneas que nos llegan del proceso anterior por stdin
-    for linea in sys.stdin:
-        # Quitamos saltos de línea y espacios
-        linea = linea.strip()
-        
-        # Separamos los campos por comas
-        campos = linea.split(',')
-        
-        # Los campos que nos llegan son: apellido, nombre, salario
-        apellido = campos[0]
-        nombre = campos[1]
-        salario = float(campos[2])
-        
-        # Si el salario es mayor o igual que el mínimo, enviamos la línea
-        if salario >= salario_minimo:
-            print(f"{apellido},{nombre},{salario}")
-
-# Función que ejecuta el Proceso 3: escribe el resultado final
-def proceso_filtro3():
-    # Abrimos el fichero empleados.txt en modo escritura
-    with open("empleados.txt", 'w') as fichero:
-        # Leemos las líneas que nos llegan del proceso anterior por stdin
-        for linea in sys.stdin:
-            # Quitamos saltos de línea y espacios
-            linea = linea.strip()
-            
-            # Separamos los campos por comas
-            campos = linea.split(',')
-            
-            # Los campos que nos llegan son: apellido, nombre, salario
-            apellido = campos[0]
-            nombre = campos[1]
-            salario = campos[2]
-            
-            # Escribimos en el formato solicitado: Apellido Nombre, Salario
-            fichero.write(f"{apellido} {nombre}, {salario}\n")
+            # Si el departamento coincide enviamos apellido, nombre, salario
+            if dep == departamento:
+                conn.send(f"{ape},{nom},{sal}")
     
-    print("Fichero empleados.txt creado correctamente")
+    # Indicamos que no hay mas datos
+    conn.send(None)
+    conn.close()
 
-# Programa principal
+def proceso_filtro2(salario_minimo, conn_in, conn_out):
+    # Leemos los datos que llegan desde el proceso anterior
+    while True:
+        linea = conn_in.recv()
+        if linea is None:
+            break
+        
+        ape, nom, sal = linea.split(',')
+        
+        # Si el salario cumple la condicion enviamos la linea
+        if float(sal) >= salario_minimo:
+            conn_out.send(f"{ape},{nom},{sal}")
+    
+    # Indicamos que no hay mas datos
+    conn_out.send(None)
+    conn_in.close()
+    conn_out.close()
+
+def proceso_filtro3(conn):
+    # Abrimos el fichero de salida
+    with open("empleados.txt", 'w') as f:
+        
+        # Leemos los datos que llegan desde el proceso anterior
+        while True:
+            linea = conn.recv()
+            if linea is None:
+                break
+            
+            ape, nom, sal = linea.split(',')
+            
+            # Escribimos en el formato solicitado
+            f.write(f"{ape} {nom}, {sal}\n")
+    
+    conn.close()
+
 if __name__ == "__main__":
-    # Si recibimos argumentos, ejecutamos el proceso correspondiente
-    if len(sys.argv) > 1:
-        proceso_tipo = sys.argv[1]
-        
-        if proceso_tipo == "filtro1":
-            departamento = sys.argv[2]
-            proceso_filtro1(departamento)
-        elif proceso_tipo == "filtro2":
-            salario_minimo = float(sys.argv[2])
-            proceso_filtro2(salario_minimo)
-        elif proceso_tipo == "filtro3":
-            proceso_filtro3()
-    else:
-        # Si no hay argumentos, ejecutamos el Main
-        
-        print("=== EJERCICIO 2 ===\n")
-        
-        # Pedimos al usuario el departamento y el salario mínimo
-        departamento = input("Introduce el nombre del departamento: ")
-        salario_minimo = input("Introduce el salario mínimo: ")
-        
-        print(f"\nBuscando empleados del departamento '{departamento}' con salario >= {salario_minimo}...\n")
-        
-        # Creamos una cadena de procesos conectados por tuberías (pipes)
-        # Proceso 1: Filtra por departamento
-        proceso1 = subprocess.Popen(
-            ['python3', __file__, 'filtro1', departamento],
-            stdout=subprocess.PIPE  # La salida del proceso1 irá al proceso2
-        )
-        
-        # Proceso 2: Filtra por salario mínimo
-        # La entrada (stdin) viene del proceso1
-        proceso2 = subprocess.Popen(
-            ['python3', __file__, 'filtro2', salario_minimo],
-            stdin=proceso1.stdout,  # Recibe la salida del proceso1
-            stdout=subprocess.PIPE  # La salida del proceso2 irá al proceso3
-        )
-        
-        # Cerramos la salida del proceso1 en el main para que el proceso2 reciba el EOF
-        proceso1.stdout.close()
-        
-        # Proceso 3: Escribe el resultado en empleados.txt
-        # La entrada (stdin) viene del proceso2
-        proceso3 = subprocess.Popen(
-            ['python3', __file__, 'filtro3'],
-            stdin=proceso2.stdout  # Recibe la salida del proceso2
-        )
-        
-        # Cerramos la salida del proceso2 en el main
-        proceso2.stdout.close()
-        
-        # Esperamos a que terminen todos los procesos
-        proceso1.wait()
-        proceso2.wait()
-        proceso3.wait()
-        
-        print("\n¡Proceso completado!")
-        print("Revisa el fichero empleados.txt para ver los resultados")
+
+    # Pedimos los datos al usuario
+    departamento = input("Introduce el departamento: ")
+    salario_minimo = float(input("Introduce el salario minimo: "))
+
+    # Pipe entre filtro1 y filtro2
+    c1_out, c1_in = Pipe()
+    
+    # Pipe entre filtro2 y filtro3
+    c2_out, c2_in = Pipe()
+
+    # Creamos los procesos
+    p1 = Process(target=proceso_filtro1, args=(departamento, c1_in))
+    p2 = Process(target=proceso_filtro2, args=(salario_minimo, c1_out, c2_in))
+    p3 = Process(target=proceso_filtro3, args=(c2_out,))
+
+    # Lanzamos los procesos
+    p1.start()
+    p2.start()
+    p3.start()
+
+    # Esperamos a que terminen
+    p1.join()
+    p2.join()
+    p3.join()
+
+    print("Procesos acabados")
